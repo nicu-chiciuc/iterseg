@@ -13,7 +13,8 @@
 </head>
 <body onload="startScript();">
     <script>
-    function startScript() {
+    function startScript()
+    {
         "use strict";
         //the code below is very ugly, please read carefully
 
@@ -27,35 +28,39 @@
 
         var stage = new PIXI.Stage(0xe0ffff, true);
 
-        var renderer  = new PIXI.CanvasRenderer(WIDTH, HEIGHT, null, false, true);        
+        //var renderer = new PIXI.CanvasRenderer(400, 300);
+        var renderer  = new PIXI.CanvasRenderer(WIDTH, HEIGHT, null, false, true);
+        // var context = renderer.context;
+        
 
         var lineSprite = new PIXI.Sprite(PIXI.Texture.fromCanvas(drawingCanvas));
         stage.addChild(lineSprite);
         
 
+        var recurLevel = 4;
+
         var linesGrph = new PIXI.Graphics();
+        var recurGrph = new PIXI.Graphics();
         var gridGrph  = new PIXI.Graphics();
         var tempGrph  = new PIXI.Graphics();
-
-        var recurLevel = 4;
-        var numPoints  = 5; //including start and finish
-        var L          = new LGraph(numPoints);
-
-        var GRID_DIST = 20;
-        var MIN_LINE_DIST = 3;
+        var numPoints = 5; //including start and finish
+        var connect   = new Graph(numPoints+20);
+        
+        var direction;
+        var gridDist = 20;
 
         //flags
-        var Flag = {
-            Use_Grid            : true,
-            Over_Objects        : false,
-            Creating_Connection : {is: false, from: -1},
-            Draw_Points_Lines   : true,
-            CHANGED             : true,
-            Over_Buttons        : false,
-            Show_Display        : true
-        }
-
+        var Use_Grid = true;
+        var Over_Objects = false;
+        var Ctrl_Pressed = false;
+        var Creating_Connection = {is: false, from: -1};
+        var Draw_Points_Lines = true;
+        var CHANGED = true;
         var canvasCode;
+        var MIN_LINE_DIST = 3;
+        var Over_Buttons = false;
+        var Show_Display = true;
+
         // var polVect;
          
         document.body.appendChild(renderer.view);
@@ -65,6 +70,7 @@
         stage.addChild(gridGrph);
         stage.addChild(tempGrph);
         stage.addChild(linesGrph);
+        stage.addChild(recurGrph);
 
         var text = new PIXI.Text("Recursion deepness: " + recurLevel, {font:"20px Arial", fill:"black"});
         stage.addChild(text);
@@ -105,14 +111,14 @@ press LEFT and RIGHT to increase/decrease recursion level",
             },
 
             redrawArrows: function(graphics){
-                if (!Flag.Show_Display) return;
+                if (!Show_Display) return;
 
                 graphics.clear();
                 graphics.alpha = 0.3;
 
-                for (var i=0; i<L  .list1.length; ++i)
-                    this.drawArrow(graphics, new Vector(points[ L  .list1[i].from ].x, points[ L  .list1[i].from ].y),
-                                        new Vector(points[ L  .list1[i].to   ].x, points[ L  .list1[i].to   ].y));
+                for (var i=0; i<connect.list1.length; ++i)
+                    this.drawArrow(graphics, new Vector(points[ connect.list1[i].from ].x, points[ connect.list1[i].from ].y),
+                                        new Vector(points[ connect.list1[i].to   ].x, points[ connect.list1[i].to   ].y));
                 
             },
 
@@ -141,48 +147,33 @@ press LEFT and RIGHT to increase/decrease recursion level",
             },
         }
 
-        //not working as expected
         window.onresize = function(){
-            WIDTH  = gridGrph.width  = drawingCanvas.width  = window.innerWidth;
-            HEIGHT = gridGrph.height = drawingCanvas.height = window.innerHeight;
+            WIDTH = window.innerWidth;
+            HEIGHT = window.innerHeight;
             renderer.resize(WIDTH, HEIGHT);
-            GeneralDrawing.drawGrid(gridGrph, GRID_DIST);
         }
 
-        GeneralDrawing.drawGrid(gridGrph, GRID_DIST);
+        GeneralDrawing.drawGrid(gridGrph, gridDist);
 
 
         // all the points
-        var points = new Array(L.num);
+        var points = new Array(numPoints);
         points[0] = DR_Point(0x00ee00 , 100, 100, 0);
         points[1] = DR_Point(0xee0000, 1000, 100, 1);
         points[2] = DR_Point(0x000000, 400, 100 , 2);
         points[3] = DR_Point(0x000000, 550, 300 , 3);
         points[4] = DR_Point(0x000000, 700, 100 , 4);
 
-        for (var i=0; i<L.num; i++)
-            L.points[i] = points[i].position;
-
-        console.log(L.num);
-        for (var i=0; i<L.num; i++)
+        for (var i=0; i<numPoints; i++)
             stage.addChild(points[i]);
         // all the points
 
-        L  .set2D(0, 2, 1);
-        L  .set2D(2, 3, 1);
-        L  .set2D(3, 4, 1);
-        L  .set2D(4, 1, 1);
+        connect.set2D(0, 2, 1);
+        connect.set2D(2, 3, 1);
+        connect.set2D(3, 4, 1);
+        connect.set2D(4, 1, 1);
 
         requestAnimFrame( animate );
-
-        function LStage() {
-            this.resetRecurText = function(){
-                text.setText("Recursion deepness:  " + recurLevel);
-            }
-
-
-
-        }   
 
         function resetRecurText(){
             text.setText("Recursion deepness:  " + recurLevel);
@@ -247,8 +238,8 @@ press LEFT and RIGHT to increase/decrease recursion level",
 
             nowButton.mouseover = function(){
                 console.log("in button" + nowButton.act);
-                Flag.Over_Buttons = true;
-                Flag.Over_Objects = true;
+                Over_Buttons = true;
+                Over_Objects = true;
                 if (!this.clicked)
                     this.alpha = 0.7;
             }
@@ -265,8 +256,8 @@ press LEFT and RIGHT to increase/decrease recursion level",
             }
             nowButton.mouseout = function(){
                 console.log("out button" + nowButton.act);
-                Flag.Over_Buttons = false;
-                Flag.Over_Objects = false;
+                Over_Buttons = false;
+                Over_Objects = false;
                 if (!this.clicked)
                     this.alpha = 0.5;
             }
@@ -277,7 +268,9 @@ press LEFT and RIGHT to increase/decrease recursion level",
         }
 
         stage.click = function(e){
-            if (!Flag.Over_Objects)
+            console.log(Over_Objects);
+            console.log(Over_Buttons);
+            if (!Over_Objects)
             {
                 if (Action === "CREATE")
                 {
@@ -292,26 +285,29 @@ press LEFT and RIGHT to increase/decrease recursion level",
             e = e || window.event;
 
             if (e.keyCode == '72') {
-                if (Flag.Use_Grid)
+                if (Use_Grid)
                 {
-                    Flag.Use_Grid = false
+                    Use_Grid = false
                     gridGrph.clear();
                 }else{
-                    GeneralDrawing.drawGrid(gridGrph, GRID_DIST);
-                    Flag.Use_Grid = true;
+                    GeneralDrawing.drawGrid(gridGrph, gridDist);
+                    Use_Grid = true;
                 }
+            }else 
+            if (e.keyCode == '17') {
+                Ctrl_Pressed = true;
             }else
             if (e.keyCode == '32') {
-                Flag.Draw_Points_Lines = !Flag.Draw_Points_Lines;
+                Draw_Points_Lines = !Draw_Points_Lines;
             }else
             if (e.keyCode == '39') {
                 increaseRecurLevel();
                 
-                Flag.CHANGED = true;
+                CHANGED = true;
             }else
             if (e.keyCode == '37') {
                 decreaseRecurLevel();
-                Flag.CHANGED = true;
+                CHANGED = true;
             }else
             if (e.keyCode == '83') {
                 showHideUI();
@@ -320,9 +316,9 @@ press LEFT and RIGHT to increase/decrease recursion level",
 
         function showHideUI(){
             var nowAlpha;
-            Flag.Show_Display = !Flag.Show_Display;
+            Show_Display = !Show_Display;
 
-            if (!Flag.Show_Display){
+            if (!Show_Display){
                 nowAlpha = 0.01;
                 linesGrph.clear();
             }
@@ -342,7 +338,7 @@ press LEFT and RIGHT to increase/decrease recursion level",
 
         function deleteNode(num){
             if (num > 1) { //if num is not start or end point
-                L.deleteElm(num);
+                connect.deleteElm(num);
                 stage.removeChild(points[num]);
                 points.splice(num, 1);
                 numPoints--;
@@ -352,21 +348,25 @@ press LEFT and RIGHT to increase/decrease recursion level",
 
         function createNode(posx, posy){
             points.push(DR_Point(0x000000, posx, posy, numPoints));
-            L.addNode(points[points.length-1].position);
             stage.addChild(points[numPoints]);
+            console.log(points[numPoints]);
             numPoints++;
         }
 
-
+        document.onkeyup = function checkKey(e) {
+            if (e.keyCode == '17') {
+                Ctrl_Pressed = false;
+            }
+        }
 
         function setDragging(point) {
 
             point.mouseover = function(){
-                Flag.Over_Objects = true;
+                Over_Objects = true;
             }
 
             point.mouseout = function(){
-                Flag.Over_Objects = false;
+                Over_Objects = false;
             }
 
             point.click = point.tap = function(data){
@@ -399,8 +399,8 @@ press LEFT and RIGHT to increase/decrease recursion level",
                 }else
                 if (Action === "CREATE")
                 {
-                    Flag.Creating_Connection.is = true;
-                    Flag.Creating_Connection.from = this.number;
+                    Creating_Connection.is = true;
+                    Creating_Connection.from = this.number;
                 }
             };
 
@@ -410,7 +410,7 @@ press LEFT and RIGHT to increase/decrease recursion level",
             point.mouseup = point.touchend = function(data)
             {
                 console.log("mouseup - " + this.number);
-                Flag.CHANGED = true;
+                CHANGED = true;
                 this.alpha = this.normalAlpha;
                 this.dragging = false;
                 // set the interaction data to null
@@ -419,15 +419,15 @@ press LEFT and RIGHT to increase/decrease recursion level",
                 if (Action === "CREATE")
                 {
                     console.log("--");
-                    console.log(Flag.Creating_Connection.is);
-                    console.log(Flag.Creating_Connection.from);
+                    console.log(Creating_Connection.is);
+                    console.log(Creating_Connection.from);
                     console.log(this.number);
 
 
-                    L.set2D(Flag.Creating_Connection.from, this.number, 1);
-                    points[Flag.Creating_Connection.from].dragging = false;
+                    connect.set2D(Creating_Connection.from, this.number, 1);
+                    points[Creating_Connection.from].dragging = false;
                     tempGrph.clear();
-                    Flag.Creating_Connection.is = false;
+                    Creating_Connection.is = false;
                     
                 }
             };
@@ -439,9 +439,9 @@ press LEFT and RIGHT to increase/decrease recursion level",
                     if (Action === "MOVE"){
                         
                         var newPosition = this.data.getLocalPosition(this.parent);
-                        if (Flag.Use_Grid){
-                            newPosition.x -= newPosition.x % GRID_DIST; 
-                            newPosition.y -= newPosition.y % GRID_DIST;
+                        if (Use_Grid){
+                            newPosition.x -= newPosition.x % gridDist; 
+                            newPosition.y -= newPosition.y % gridDist;
                         }
                         this.position.x = newPosition.x;
                         this.position.y = newPosition.y;
@@ -449,7 +449,7 @@ press LEFT and RIGHT to increase/decrease recursion level",
 
                     }else
                     if (Action === "CREATE" &&
-                        Flag.Creating_Connection.is){
+                        Creating_Connection.is){
 
                         tempGrph.clear();
                         tempGrph.alpha = 0.4;
@@ -458,9 +458,47 @@ press LEFT and RIGHT to increase/decrease recursion level",
                                   new Vector(data.originalEvent.pageX, data.originalEvent.pageY));
                     }
 
-                    Flag.CHANGED = true;
+                    CHANGED = true;
                 }
             }
+        }
+
+
+        function Graph(elems)
+        {
+            var num     = elems; 
+            this.tab2   = array2D(elems, elems);
+            this.list1  = [];
+            this.points = [];
+
+            this.set2D = function(from, to, val)
+            {
+                this.tab2[from][to] = val; //1 or 0
+                
+                this.recalcList();
+            }
+
+            this.recalcList = function(){
+                this.list1.length = 0;
+                for (var i=0; i<num; ++i)
+                for (var j=0; j<num; ++j)
+                    if (this.tab2[i][j] === 1)
+                        this.list1.push({from: i, to: j});
+            }
+
+            this.deleteElm = function(elem)
+            {
+                this.tab2.splice(elem, 1);
+                for (var i=0; i<num-1; ++i)
+                    this.tab2[i].splice(elem, 1);
+
+                num--;
+
+                this.recalcList();
+            }
+
+            if (num < 2)
+                num = 2;
         }
 
         function DR_Point(color, posx, posy, num){
@@ -489,7 +527,98 @@ press LEFT and RIGHT to increase/decrease recursion level",
             return point;
         }
 
-        function DPoints(){
+        function array2D(rows, cols)
+        {
+            var t = new Array(rows);
+            for (var i=0; i<rows; ++i)
+            {
+                t[i] = new Array(cols);
+                for (var j=0; j<cols; ++j)
+                    t[i][j] = 0;
+            }
+            return t;
+        }
+
+        function XGraph() {
+            
+        }
+
+
+        function toPolarVectors(points){
+            var ret = [];
+            //vector from start point to end point
+            var dir = new Vector(points[1].x-points[0].x, points[1].y-points[0].y);
+
+            for (var i=0; i<points.length; ++i)
+            {
+                //vector from start point to point[i]
+                var v = new Vector(points[i].x - points[0].x, points[i].y - points[0].y);
+                //vector with dir as unit vector
+                v.setPolar(v.rad / dir.rad, v.ang - dir.ang);
+                ret.push(v);
+            }
+            return ret;   
+        }
+        
+        function drawRecurLineCanvas(context, polVect, Svec, Fvec, lev, code)
+        {
+            if (code !== canvasCode)
+                return;
+
+            if (lev === 0 ||
+                (Math.pow(Svec.x - Fvec.x, 2) + Math.pow(Svec.y - Fvec.y, 2)) 
+                    < (MIN_LINE_DIST * MIN_LINE_DIST) //smaller than 1 pixel
+                )
+            {
+                drawLine(Svec.x, Svec.y, Fvec.x, Fvec.y);
+            }else
+            if (lev > 0)
+            {
+                var dir = new Vector(Fvec.x - Svec.x, Fvec.y - Svec.y);
+
+                var pNow = []; 
+
+                for (var i=0; i<numPoints; ++i)
+                {
+                    var temp = new Vector(polVect[i].x, polVect[i].y);
+
+                    temp.rad = temp.rad * dir.rad;
+                    temp.ang = temp.ang + dir.ang;
+
+                    temp.x = temp.x + Svec.x;
+                    temp.y = temp.y + Svec.y;
+
+                    pNow.push(temp);
+                }
+
+                for (var i=0; i<connect.list1.length; ++i)
+                {
+                    var x1 = pNow[ connect.list1[i].from ].x,
+                        y1 = pNow[ connect.list1[i].from ].y,
+                        x2 = pNow[ connect.list1[i].to ].x,
+                        y2 = pNow[ connect.list1[i].to ].y;
+
+                    if ((Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2)) 
+                            < (MIN_LINE_DIST * MIN_LINE_DIST))
+                    {
+                        drawLine(x1, y1, x2, y2);
+                        continue;
+                    }
+
+                    if (code !== canvasCode) return;
+
+                    setTimeout(function(i){
+                        drawRecurLineCanvas(context, polVect, pNow[ connect.list1[i].from ], pNow[ connect.list1[i].to ], lev-1, code);
+                    }, 1, i);
+                }
+            }
+
+            function drawLine(x1, y1, x2, y2){
+                context.beginPath();
+                context.moveTo(x1, y1);
+                context.lineTo(x2, y2);
+                context.stroke();
+            }
         }
 
         function animate() {
@@ -497,15 +626,18 @@ press LEFT and RIGHT to increase/decrease recursion level",
             
             renderer.render(stage);
 
-            if (Flag.CHANGED){
-                Flag.CHANGED = !Flag.CHANGED;
+            if (CHANGED){
+                CHANGED = !CHANGED;
 
-                if (Flag.Draw_Points_Lines)
+                if (Draw_Points_Lines)
                     GeneralDrawing.redrawArrows(linesGrph);
 
-                L.updateVectors();
+                canvasCode = Math.floor(Math.random()*1000000);
+
+                var polVect = toPolarVectors(points);
                 context.clearRect(0, 0, WIDTH, HEIGHT);
-                L.drawRecurLineCanvas(context, recurLevel);
+                drawRecurLineCanvas(context, polVect, new Vector(points[0].x, points[0].y), new Vector(points[1].x, points[1].y), recurLevel, canvasCode);
+                lineSprite.setTexture(PIXI.Texture.fromCanvas(drawingCanvas));
             }            
         }
     }
