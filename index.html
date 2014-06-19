@@ -1,0 +1,115 @@
+<html>
+<head>
+    <style>
+        .draggable {
+            cursor: move;
+        }
+
+        .absolute-pos {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    
+
+        .toolboxes {
+            rx: '4px';
+            ry: '4px';
+            fill: white;
+            stroke: black;
+            stroke-width: 1;
+            opacity: 0.85;
+        }
+
+        .ui-button.redButton {
+            background: red;
+        }
+
+        .ui-dialog-titlebar-close {
+            visibility: hidden;
+        }
+
+        .line-button {
+            /*width: 300px;*/
+        }
+    </style>
+    <script src='utils.js'></script>
+    <script src="js/snap.svg.js"></script>
+    <link href="css/smoothness/jquery-ui-1.10.4.custom.css" rel="stylesheet">
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-ui-1.10.4.custom.js"></script>
+    <script src="js/spectrum.js"></script>
+    <link href="css/spectrum.css" rel="stylesheet" type="text/css">
+    <script src="main.js"></script>
+
+</head> 
+
+<body onload="run();">
+
+<div id="dialog" title="Menu">
+    <button class='line-button' id='but-base'>Base Layer</button>
+    <div id='buttons-div'></div>
+    <button class='line-button' id='add-layers'>Add Layer</button>
+    
+    
+    <input type="checkbox"  id='rel-width'>
+        <label for="rel-width">Relative Width</label>
+
+
+    <div id="toolbar" class="ui-widget-header ui-corner-all">
+
+        <button id="play">play</button>
+        <button id="stop">stop</button>
+        <button class='line-button' id='clear-canvas'>Clear</button>
+
+    </div>
+
+
+    <input type="1" id='deep-spinner'>
+
+    <div id='min-dist'></div>
+
+    <input type='text' id="layerColor"/>
+    <div id='alphaSlider'></div>
+    <div id='queueLength'>0</div>
+
+    <input type="checkbox"  id='dynamic-drawing'><label for="dynamic-drawing">Dynamic Drawing</label>
+
+    <div id='grid-type'>
+        <input name="radio" type="radio" id='putCartesianGrid' checked="checked"><label for="putCartesianGrid">Put Cartesian Grid</label>         
+        <input name="radio" type="radio" id='putPolarGrid'>                      <label for="putPolarGrid">Put Polar Grid </label>
+        <input name="radio" type="radio" id='removeGrid'>                        <label for="removeGrid">Remove Grid</label>
+    </div>
+    <button class='line-button' id='save-png'>Save as PNG</button>    
+</div>
+
+<div id='layerDialogs'>
+
+</div>
+
+<div id="popupChange">
+    
+</div>
+
+<div id='layerDialog'>
+    
+</div>
+
+
+<div>
+    <div id='background-layer'>
+        
+    </div>
+    <div id='drawing-layer'>
+        
+    </div>
+</div>
+
+<div id='svg-layers'>
+</div>
+    
+
+
+
+</body>
+</html>
