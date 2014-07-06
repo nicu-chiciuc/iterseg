@@ -694,86 +694,23 @@ class Grid extends Canvas
 class Circle
 
     constructor : (layer, x, y, innerCol, outterCol) ->
-        mouseDown  = (x, y, evt) =>
-            nowType = Utils.buttonType( evt )
-
-            if evt.ctrlKey is false
-
-                if nowType is 'left'
-                    @dragType = 'left';
-
-                else if nowType is 'right' and
-                        layer.canCreate
-                    @dragType  = 'right'
-                    
-                    box            = @group.getBBox()
-                    
-                    layer._crLine.now   = 'dragging'
-                    layer._crLine.stX   = box.cx
-                    layer._crLine.stY   = box.cy
-                    layer._crLine.start = this
-
-                else if nowType is 'middle'
-                    if layer.canCreate
-                            layer.removeCircle(this)
-
-            else
-                if nowType is 'left' and @canBeRandom
-                    @dragType = 'random'
-                    @varCirc.attr( r : Utils.dist2points(@getCx(), @getCy(), x, y) )
-
-                if nowType is 'middle'
-                    @varCirc.attr( r : 0 )
-
-            return
-       
-        mouseMove = (dx, dy, nx, ny, evt) =>
-            if @dragType is 'left'
-                vec = GLB.grid.gridSnap(nx, ny)
-                @moveTo(vec.x, vec.y)
-
-                layer.updateArrows()
-            if @dragType is 'right' and layer.canCreate
-                
-                a = Utils.getArrow(layer._crLine.stX, layer._crLine.stY, nx, ny, 15)
-
-                Utils.setpoly(layer._crLine.arrow, a)     
-
-            else if @dragType is 'random'
-                @varCirc.attr( r : Utils.dist2points(@getCx(), @getCy(), nx, ny) )
-            
-            GLB.drawDynamic()
-
-            return               
-            
-        mouseEnd    = (evt) =>
-            layer.lastCircle = this
-            if @dragType == 'left'
-                # nothing happens
-            else if @dragType == 'right' and
-                    layer.canCreate
-                layer._crLine.now = ''
-                layer._crLine.arrow.attr( points: '' )
-
-            @dragType = 'none'
-            return
-
         setupGroup = () =>
-            circle = this
+            self = this
 
             layer.snap.g(@outterCirc, @innerCirc)
-                .drag(mouseMove, mouseDown, mouseEnd)
-                .mouseup( ->
+                .drag(@_mouseMove, @_mouseDown, @_mouseEnd, this, this, this)
+                .mouseup( () ->
                     if layer.canCreate
                         if layer._crLine.now is 'dragging'
                             indStart = layer.circles.indexOf(layer._crLine.start)
-                            indEnd   = layer.circles.indexOf(circle)
+                            indEnd   = layer.circles.indexOf(self)
                             layer.addArrow(indStart, indEnd)
                             layer._crLine.arrow.attr( points: '' )
                 )
 
         @dragType    = 'none'
         @canBeRandom = true
+        @layer       = layer
         
         @outterCirc  = layer.snap.circle(x, y, 25).attr( 'fill' : outterCol )
         @innerCirc   = layer.snap.circle(x, y, 15).attr( 'fill' : innerCol  )
@@ -782,6 +719,74 @@ class Circle
         this.makeVisible()
 
         @group = setupGroup()
+
+
+    _mouseDown  : (x, y, evt) ->
+        nowType = Utils.buttonType( evt )
+
+        if evt.ctrlKey is false
+            switch nowType
+                when 'left' 
+                    @dragType = 'left';
+
+                when 'right'
+                    if @layer.canCreate
+                        @dragType           = 'right'
+                        
+                        box                 = @group.getBBox()
+                        
+                        @layer._crLine.now   = 'dragging'
+                        @layer._crLine.stX   = box.cx
+                        @layer._crLine.stY   = box.cy
+                        @layer._crLine.start = this
+
+                when 'middle'
+                    if @layer.canCreate
+                        @layer.removeCircle(this)
+
+        else
+            switch nowType
+                when 'left'
+                    if @canBeRandom
+                        @dragType = 'random'
+                        @varCirc.attr( r : Utils.dist2points(@getCx(), @getCy(), x, y) )
+
+                when 'middle'
+                    @varCirc.attr( r : 0 )
+
+        return
+   
+    _mouseMove : (dx, dy, nx, ny, evt) ->
+        if @dragType is 'left'
+            vec = GLB.grid.gridSnap(nx, ny)
+            @moveTo(vec.x, vec.y)
+
+            @layer.updateArrows()
+        if @dragType is 'right' and @layer.canCreate
+            
+            a = Utils.getArrow(@layer._crLine.stX, @layer._crLine.stY, nx, ny, 15)
+
+            Utils.setpoly(@layer._crLine.arrow, a)     
+
+        else if @dragType is 'random'
+            @varCirc.attr( r : Utils.dist2points(@getCx(), @getCy(), nx, ny) )
+        
+        GLB.drawDynamic()
+
+        return               
+        
+    _mouseEnd : (evt) ->
+        @layer.lastCircle = this
+        if @dragType == 'left'
+            # nothing happens
+        else if @dragType == 'right' and
+                @layer.canCreate
+            @layer._crLine.now = ''
+            @layer._crLine.arrow.attr( points: '' )
+
+        @dragType = 'none'
+        return
+
   
     moveTo : (nx, ny) ->
         @innerCirc.attr(
@@ -896,49 +901,52 @@ class Arrow
 
 ####################################################################################################################################################
 
+class Background
+    constructor : (layer) ->        
+        @rect = layer.snap.rect(0, 0, GLB.width, GLB.height)
+                    .attr( 'fill' : layer.color )
+                    # .drag(backMove, backStart, backEnd)
+                    .mouseup((evt) ->
+                        if layer.canCreate
+                            if Utils.buttonType(evt) == 'right' and
+                                    layer._crLine.now != 'dragging' 
+                                nx = evt.clientX
+                                ny = evt.clientY
+
+                                layer.addCircle(nx, ny, 'gray')       
+                    )
+
+        @makeVisible()
+
+        return
+
+    makeInvisible : () -> 
+        @rect.attr('fill-opacity' : 0)
+        return this
+
+    makeVisible : () ->
+        @rect.attr('fill-opacity' : 0.2)
+        return this
+
+    resize : ( width, height ) ->
+        @rect.attr(
+            'width'  : width
+            'height' : height
+        )
+        return this
+
+    changeColor : ( color ) ->
+        @rect.attr( 'fill' : color )
+        return this
+
+####################################################################################################################################################
+
+####################################################################################################################################################
+
 class LineLayer
-    
-    # Basic setup
     constructor : (col, base) ->  
 
-        setClickableBackground = =>
-            layer = this
-            stP = new Vector() # start point
-            stC = []
-
-            backMove = (dx, dy, nx, ny, evt) ->
-
-                for i in [0...layer.circles.length] by 1
-                    c = layer.circles[i]
-                    console.log(c.getCx());
-                    c.moveTo(stC[i].x + nx - stP.x, stC[i].y + ny - stP.y)
-                layer.updateArrows()
-
-            backStart = (x, y, evt) ->
-                stP.x = x
-                stP.y = y
-                stC = []
-                for i in [0...layer.circles.length] by 1
-                    stC[i] = new Vector(layer.circles[i].getCx(), layer.circles[i].getCy())
-
-            backEnd = (evt) ->
-
-
-            
-            @snap.rect(0, 0, GLB.width, GLB.height)
-                        .attr( 'fill-opacity': 0)
-                        # .drag(backMove, backStart, backEnd)
-                        .mouseup((evt) ->
-                            if layer.canCreate
-                                if Utils.buttonType(evt) == 'right' and
-                                        layer._crLine.now != 'dragging' 
-                                    nx = evt.clientX
-                                    ny = evt.clientY
-
-                                    layer.addCircle(nx, ny, 'gray')       
-                        )
-
-        createInitialCircles = =>
+        createInitialCircles = () =>
             if @layerType == 'base'
                 @addCircle(100, 100, 'gray')
             else
@@ -949,22 +957,21 @@ class LineLayer
             return
 
         ## Initialization ##
-
-        @layerType = base
-        @color     = col
-        @canCreate = true
-
-        @snap      = Snap(GLB.width, GLB.height).attr( class: 'absolute-pos' )
+        @layerType  = base
+        @color      = col
+        @alpha      = 1 # should be only 1 or 0, no gray values 
+        @canCreate  = true
         
+        @snap       = Snap(GLB.width, GLB.height).attr( class: 'absolute-pos' )
         
         # Array of the arrows
-        @arrows    = []
+        @arrows     = []
         # Array of the circles
-        @circles   = []
-
+        @circles    = []
+        @background = new Background(this)
+        
         # 2D array that represents the graph in a table form
-        @graph     = []  
-        @alpha     = 1 # should be only 1 or 0, no gray values      
+        @graph      = []    
 
         # The arrow used temporary while creating other arrows
         @_crLine = 
@@ -979,11 +986,12 @@ class LineLayer
         # In order to put the circles above the lines
         @SVGgroups =
             SVGvisuals    : @snap.g()
-            SVGbackground : setClickableBackground()
+            SVGbackground : @snap.g()
             SVGarrows     : @snap.g()
             SVGcircles    : @snap.g()
 
         @SVGgroups.SVGvisuals.add(@_crLine.arrow)
+        # @SVGgroups.SVGbackground.add(@background.rect)
         
         createInitialCircles()
 
@@ -997,6 +1005,8 @@ class LineLayer
         @snap.node.setAttribute( 'width' , sWidth  )
         @snap.node.setAttribute( 'height', sHeight )
 
+        @background.resize(width, height)
+
         @SVGgroups.SVGbackground.attr(
             'width'  : sWidth  
             'height' : sHeight
@@ -1004,12 +1014,14 @@ class LineLayer
 
     # Make disks and arrows invisible
     makeInvisible : ->
+        @background.makeInvisible()
         circle.makeInvisible() for circle in @circles
         arrow.makeInvisible()  for arrow  in @arrows
         return 
 
     # Make disks and arrows visible 
     makeVisible : ->
+        @background.makeVisible()
         circle.makeVisible() for circle in @circles
         arrow.makeVisible()  for arrow  in @arrows
         return
@@ -1078,8 +1090,9 @@ class LineLayer
     
     changeColor : (color) ->
         @color = color
-        for c in @circles
-            c.changeInnerColor( color )
+
+        @background.changeColor( color )        
+        c.changeInnerColor( color ) for c in @circles
         return
 
     # Change the color of all the arrows of type layNum
