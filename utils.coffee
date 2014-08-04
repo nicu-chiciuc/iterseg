@@ -1,12 +1,12 @@
 class Matrix
-    constructor : ->
+    constructor : () ->
         @mat  = Utils.array1D(9, 0)
         @temp = Utils.array1D(9, 0)
         @chg  = Utils.array1D(9, 0)
         @clear()
 
 
-    clear : ->
+    clear : () ->
         Utils.unitMatrix3(@mat)
         return this
 
