@@ -315,6 +315,8 @@ class Drawing extends Canvas
         @_randRad
         @_temp
         @_width
+        @_outsideS
+        @_outsideF
 
         return
 
@@ -433,11 +435,16 @@ class Drawing extends Canvas
         @_lev   = @_ref[5]
         @_flip  = @_ref[6]
 
+        # extend the bounds so as to be sure that it's not prematurely
+        @_outsideS = (@_SvecX < -GLB.width or @_SvecX > GLB.width*2) or (@_SvecY < -GLB.height or @_SvecY > GLB.height*2)
+        @_outsideF = (@_FvecX < -GLB.width or @_FvecX > GLB.width*2) or (@_FvecY < -GLB.height or @_FvecY > GLB.height*2)
+
         # Decide to draw the line or to 
         # go deeper
         if  @_lev  is 0 or 
             @_type is 0 or # the 0 @_type is set to be a simple line so it can be optimized
-                ((@_SvecX - @_FvecX)**2 + (@_SvecY - @_FvecY)**2) < (@minDist * @minDist) # smaller than 1 pixel
+                ((@_SvecX - @_FvecX)**2 + (@_SvecY - @_FvecY)**2) < (@minDist * @minDist) or # smaller than 1 pixel
+                (@_outsideS and @_outsideF) # both points are outside
         
             @drawLine(@_SvecX, @_SvecY, @_FvecX, @_FvecY, @_type);
 

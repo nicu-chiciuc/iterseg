@@ -306,6 +306,8 @@ Drawing = (function(_super) {
     this._randRad;
     this._temp;
     this._width;
+    this._outsideS;
+    this._outsideF;
     return;
   }
 
@@ -411,7 +413,9 @@ Drawing = (function(_super) {
     this._type = this._ref[4].colorNum;
     this._lev = this._ref[5];
     this._flip = this._ref[6];
-    if (this._lev === 0 || this._type === 0 || (Math.pow(this._SvecX - this._FvecX, 2) + Math.pow(this._SvecY - this._FvecY, 2)) < (this.minDist * this.minDist)) {
+    this._outsideS = (this._SvecX < -GLB.width || this._SvecX > GLB.width * 2) || (this._SvecY < -GLB.height || this._SvecY > GLB.height * 2);
+    this._outsideF = (this._FvecX < -GLB.width || this._FvecX > GLB.width * 2) || (this._FvecY < -GLB.height || this._FvecY > GLB.height * 2);
+    if (this._lev === 0 || this._type === 0 || (Math.pow(this._SvecX - this._FvecX, 2) + Math.pow(this._SvecY - this._FvecY, 2)) < (this.minDist * this.minDist) || (this._outsideS && this._outsideF)) {
       this.drawLine(this._SvecX, this._SvecY, this._FvecX, this._FvecY, this._type);
     } else if (this._lev > 0) {
       this._list = GLB.data[this._type].list;
