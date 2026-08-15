@@ -5,8 +5,8 @@
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
-    "check": "node --check main.js && node --check utils.js",
-    "preview": "wrangler dev --persist-to node_modules/.wrangler-state",
+    "check": "node --check public/main.js && node --check public/utils.js",
+    "preview": "wrangler dev",
     "deploy": "wrangler deploy",
     "deploy:preview": "wrangler versions upload"
   },

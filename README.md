@@ -3,8 +3,8 @@
 An iterated function system experiment written in CoffeeScript and published as compiled browser
 JavaScript.
 
-The CoffeeScript sources and generated browser files are kept together. Cloudflare deploys the
-browser files directly, so this project has no build step.
+The CoffeeScript sources stay at the repository root. The deployable browser files are in
+`public/`. Cloudflare serves that directory directly, so this project has no build step.
 
 ## Local preview
 
