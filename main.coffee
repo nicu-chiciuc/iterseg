@@ -98,6 +98,8 @@ class Linker
                 $(".ui-dialog-titlebar-close", ui.dialog || ui).hide()
         )
 
+        $('.samebase-attribution').appendTo($('#dialog').dialog('widget').find('.ui-dialog-titlebar'))
+
         $('#but-base').  button().click( -> self.setLayerFront( self.baseLayer ) )
         $('#but0').      button().click( -> self.setLayerFront self.layers[0] )
         $('#but1').      button().click( -> self.setLayerFront self.layers[1] )

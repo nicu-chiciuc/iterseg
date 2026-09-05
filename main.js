@@ -98,6 +98,7 @@ Linker = (function() {
         return $(".ui-dialog-titlebar-close", ui.dialog || ui).hide();
       }
     });
+    $('.samebase-attribution').appendTo($('#dialog').dialog('widget').find('.ui-dialog-titlebar'));
     $('#but-base').button().click(function() {
       return self.setLayerFront(self.baseLayer);
     });

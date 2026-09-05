@@ -33,14 +33,30 @@
             /*width: 300px;*/
         }
 
+        .ui-dialog[aria-describedby="dialog"] .ui-dialog-titlebar {
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 0 8px;
+        }
+
+        .ui-dialog[aria-describedby="dialog"] .ui-dialog-title {
+            flex: 1;
+            width: auto;
+            margin: 0;
+        }
+
         .samebase-attribution {
             display: inline-flex;
             min-height: 44px;
             align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
+            gap: 4px;
+            padding: 0 4px;
+            margin-left: auto;
+            flex-shrink: 0;
+            white-space: nowrap;
             color: #222;
-            font: 14px system-ui, sans-serif;
+            font: 12px system-ui, sans-serif;
         }
 
         .samebase-attribution:focus-visible {
@@ -101,7 +117,7 @@
         <input name="radio" type="radio" id='removeGrid'>                        <label for="removeGrid">Remove Grid</label>
     </div>
     <button class='line-button' id='save-png'>Save as PNG</button>    
-    <a class='samebase-attribution' href='https://samebase.com' target='_blank' rel='noreferrer'>
+    <a class='samebase-attribution' href='https://samebase.com' target='_blank' rel='noreferrer' aria-label='Managed with Samebase (opens in a new tab)'>
         <span>Managed with</span>
         <img src='samebase.svg' alt='' aria-hidden='true' width='16' height='16'>
         <span>Samebase</span>
