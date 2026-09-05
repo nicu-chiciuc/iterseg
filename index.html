@@ -32,6 +32,26 @@
         .line-button {
             /*width: 300px;*/
         }
+
+        .samebase-attribution {
+            display: inline-flex;
+            min-height: 44px;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            color: #222;
+            font: 14px system-ui, sans-serif;
+        }
+
+        .samebase-attribution:focus-visible {
+            outline: 2px solid #216eaa;
+            outline-offset: 2px;
+        }
+
+        .samebase-attribution img {
+            width: 16px;
+            height: 16px;
+        }
     </style>
     <script src='utils.js'></script>
     <script src="js/snap.svg.js"></script>
@@ -81,6 +101,11 @@
         <input name="radio" type="radio" id='removeGrid'>                        <label for="removeGrid">Remove Grid</label>
     </div>
     <button class='line-button' id='save-png'>Save as PNG</button>    
+    <a class='samebase-attribution' href='https://samebase.com' target='_blank' rel='noreferrer'>
+        <span>Managed with</span>
+        <img src='samebase.svg' alt='' aria-hidden='true'>
+        <span>Samebase</span>
+    </a>
 </div>
 
 <div id='layerDialogs'>
