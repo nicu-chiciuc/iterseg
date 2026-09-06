@@ -33,30 +33,23 @@
             /*width: 300px;*/
         }
 
-        .ui-dialog[aria-describedby="dialog"] .ui-dialog-titlebar {
+        #dialog .samebase-attribution {
             display: flex;
-            align-items: center;
-            box-sizing: border-box;
-            padding: 0 8px;
-        }
-
-        .ui-dialog[aria-describedby="dialog"] .ui-dialog-title {
-            flex: 1;
-            width: auto;
-            margin: 0;
-        }
-
-        .samebase-attribution {
-            display: inline-flex;
             min-height: 44px;
             align-items: center;
-            gap: 4px;
-            padding: 0 4px;
-            margin-left: auto;
-            flex-shrink: 0;
-            white-space: nowrap;
-            color: #222;
+            justify-content: flex-end;
+            color: #666;
             font: 12px system-ui, sans-serif;
+            text-decoration: none;
+        }
+
+        .samebase-attribution > span {
+            border-bottom: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .samebase-attribution:hover > span {
+            border-bottom-color: currentColor;
         }
 
         .samebase-attribution:focus-visible {
@@ -64,9 +57,10 @@
             outline-offset: 2px;
         }
 
-        .samebase-attribution img {
-            width: 16px;
-            height: 16px;
+        .samebase-attribution svg {
+            display: inline-block;
+            margin-right: 0.15em;
+            vertical-align: baseline;
         }
     </style>
     <script src='utils.js'></script>
@@ -117,10 +111,8 @@
         <input name="radio" type="radio" id='removeGrid'>                        <label for="removeGrid">Remove Grid</label>
     </div>
     <button class='line-button' id='save-png'>Save as PNG</button>    
-    <a class='samebase-attribution' href='https://samebase.com' target='_blank' rel='noreferrer' aria-label='Managed with Samebase (opens in a new tab)'>
-        <span>Managed with</span>
-        <img src='samebase.svg' alt='' aria-hidden='true' width='16' height='16'>
-        <span>Samebase</span>
+    <a class='samebase-attribution' href='https://samebase.com' target='_blank' rel='noopener noreferrer'>
+        <span>Managed with <strong><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='0.75em' height='0.75em' shape-rendering='crispEdges' aria-hidden='true'><path d='M0 0h60v60H0z M20 20h20v20H20z' fill='currentColor' fill-rule='evenodd'></path></svg>Samebase</strong></span>
     </a>
 </div>
 
