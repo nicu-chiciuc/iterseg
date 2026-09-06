@@ -32,6 +32,36 @@
         .line-button {
             /*width: 300px;*/
         }
+
+        #dialog .samebase-attribution {
+            display: flex;
+            min-height: 44px;
+            align-items: center;
+            justify-content: flex-end;
+            color: #666;
+            font: 12px system-ui, sans-serif;
+            text-decoration: none;
+        }
+
+        .samebase-attribution > span {
+            border-bottom: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .samebase-attribution:hover > span {
+            border-bottom-color: currentColor;
+        }
+
+        .samebase-attribution:focus-visible {
+            outline: 2px solid #216eaa;
+            outline-offset: 2px;
+        }
+
+        .samebase-attribution svg {
+            display: inline-block;
+            margin-right: 0.15em;
+            vertical-align: baseline;
+        }
     </style>
     <script src='utils.js'></script>
     <script src="js/snap.svg.js"></script>
@@ -81,6 +111,9 @@
         <input name="radio" type="radio" id='removeGrid'>                        <label for="removeGrid">Remove Grid</label>
     </div>
     <button class='line-button' id='save-png'>Save as PNG</button>    
+    <a class='samebase-attribution' href='https://samebase.com' target='_blank' rel='noopener noreferrer'>
+        <span>Managed with <strong><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' width='0.75em' height='0.75em' shape-rendering='crispEdges' aria-hidden='true'><path d='M0 0h60v60H0z M20 20h20v20H20z' fill='currentColor' fill-rule='evenodd'></path></svg>Samebase</strong></span>
+    </a>
 </div>
 
 <div id='layerDialogs'>
