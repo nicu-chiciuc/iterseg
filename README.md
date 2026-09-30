@@ -8,7 +8,7 @@ Please refer to [this][1] article in order to get more information.
 
 Workers Builds runs `pnpm run build`, then `pnpm run deploy` for the production
 branch or `pnpm run deploy:preview` for other branches. The preview command uses
-native Worker Previews with Wrangler 4.136.2. The empty `previews` config keeps
+native Worker Previews with the installed Wrangler version. The empty `previews` config keeps
 this app assets-only; no Convex keys or runtime secrets are required.
 
 For an existing Worker, first use **Settings > Builds > Set up Worker Previews**
