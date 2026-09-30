@@ -3,6 +3,7 @@
   "name": "iterseg",
   "compatibility_date": "2026-08-15",
   "preview_urls": true,
+  "previews": {},
   "assets": {
     "directory": ".",
     "not_found_handling": "none",
