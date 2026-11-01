@@ -3,6 +3,11 @@
 !main.js
 !utils.js
 !css/
-!css/**
+!css/*.css
+!css/smoothness/
+!css/smoothness/*.css
+!css/smoothness/images/
+!css/smoothness/images/*.png
+!css/smoothness/images/*.gif
 !js/
-!js/**
+!js/*.js

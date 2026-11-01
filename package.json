@@ -3,13 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "license": "Apache-2.0",
-  "scripts": {
-    "build": "echo \"No build required\"",
-    "deploy": "wrangler deploy",
-    "deploy:preview": "wrangler preview"
-  },
+  "type": "module",
   "devDependencies": {
-    "wrangler": "4.145.0"
+    "@alchemy.run/cloudflare": "2.0.0-beta.84",
+    "@effect/platform-node": "4.0.5",
+    "@samebase/alchemy-convex": "0.20.0",
+    "alchemy": "2.0.0-beta.84",
+    "convex": "1.48.0",
+    "effect": "4.0.5"
   },
-  "packageManager": "pnpm@10.34.5"
+  "packageManager": "pnpm@11.1.1"
 }

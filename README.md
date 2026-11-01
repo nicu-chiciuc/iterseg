@@ -4,20 +4,22 @@ Please refer to [this][1] article in order to get more information.
   [1]: http://nicusor.org.md/iterseg
 
 
-## Cloudflare Worker Previews
+## Deployment
 
-Workers Builds runs `pnpm run build`, then `pnpm run deploy` for the production
-branch or `pnpm run deploy:preview` for other branches. The preview command uses
-native Worker Previews with the installed Wrangler version. The empty `previews` config keeps
-this app assets-only; no Convex keys or runtime secrets are required.
+GitHub Actions runs `.github/workflows/alchemy.yml`. Pushes to `master` deploy the
+existing `iterseg` Worker at https://iterseg.pfp.workers.dev. Pull requests from
+this repository deploy `iterseg-pr-<number>` and get a comment with the preview
+URL. Closing the pull request deletes its preview Worker. Forks get no secrets
+and no preview.
 
-For an existing Worker, first use **Settings > Builds > Set up Worker Previews**
-and restore the commands above after Cloudflare replaces the preview command.
-Keep the existing build root and enable non-production branch builds. Verify the
-new preview URL and application before completing the rollout.
+There is no build. `.assetsignore` allows the HTML, JavaScript, CSS, and theme
+images. The Alchemy stack is `nicu-chiciuc/iterseg`; its stage state is stored in
+the `alchemy-state-store` project of Convex team `nicu`. Deployment needs the
+repository secrets `CONVEX_ACCESS_TOKEN`, `CLOUDFLARE_API_TOKEN`, and
+`CLOUDFLARE_ACCOUNT_ID`. The site itself has no Convex data or runtime secrets.
 
-Build before any manual deploy. To check the production package without an upload,
-run `pnpm exec wrangler deploy --dry-run` after the build.
-Worker Previews has no dry-run mode.
-See the [Worker Previews configuration](https://developers.cloudflare.com/workers/previews/configuration/)
-and [existing Worker setup](https://developers.cloudflare.com/workers/ci-cd/builds/build-branches/#existing-workers-connected-to-builds).
+For the first migration of an existing Worker, dispatch Alchemy on `master` with
+`adopt=true` and `plan_only=true`. Review the plan before dispatching with
+`adopt=true` and `plan_only=false`. Production has a retain policy; the workflow
+only destroys stages named `pr-<number>`. Workers Builds must be disabled after
+adoption so GitHub Actions is the only deployer.
