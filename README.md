@@ -21,5 +21,5 @@ repository secrets `CONVEX_ACCESS_TOKEN`, `CLOUDFLARE_API_TOKEN`, and
 For the first migration of an existing Worker, dispatch Alchemy on `master` with
 `adopt=true` and `plan=true`. Review the plan before dispatching with
 `adopt=true` and `plan=false`. Production has a retain policy; the workflow
-only destroys stages named `pr-<number>`. Workers Builds must be disabled after
-adoption so GitHub Actions is the only deployer.
+only destroys stages named `pr-<number>`. Workers Builds and automatic deployments
+on the legacy Pages project are disabled. GitHub Actions deploys the Worker.
